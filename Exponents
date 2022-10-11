@@ -1,0 +1,150 @@
+.data
+str0: .asciiz "\n"
+programDescription: .asciiz "Program Description: \t\t This program is going to use exponents and make sure it isnt anything negative or above 12\n"
+author: .asciiz "Author: \t\t\t\t Michael Alonso Ambrocio\n"
+creationDate: .asciiz "Creation Date: \t\t\t 9/19/22\n"
+lines: .asciiz "=======================================================================\n"
+enterBase: .asciiz "Enter a base number:"
+enterPower: .asciiz "Enter the exponent you would like to use: "
+arrow: .asciiz "==>"
+errorMsg: .asciiz "***ERROR: "
+errorMsg1: .asciiz " is not a valid number. Enter another base number:\n "
+errorMsg2: .asciiz " is not a valid exponent number. Enter another power number:\n "
+case0:	.asciiz "Any integer that's power is equal to zero will have a result of 1.\n"
+answer: .asciiz "Your answer is: "
+.text
+
+main:
+li $v0, 4
+la $a0, lines  #=====================================================
+syscall
+
+li $v0, 4
+la $a0, str0 #\n
+syscall
+
+li $v0, 4
+la $a0, programDescription #Program Description \t\t This program program written to mimic a very basic calculator
+syscall
+
+li $v0, 4
+la $a0, str0 #\n
+syscall
+
+li $v0, 4
+la $a0, author #Author \t\t\t\t Michael Alonso Ambrocio
+syscall
+
+li $v0, 4
+la $a0, str0 #\n
+syscall
+
+li $v0, 4
+la $a0, creationDate #Creation Date: \t\t\t 9/9/22
+syscall
+
+li $v0, 4
+la $a0, str0 #\n
+syscall
+
+li $v0, 4
+la $a0, lines #=========================================================
+syscall
+
+li $v0, 4
+la $a0, str0 #\n
+syscall
+
+ #this is to set up that 1 is going to be $t0 and we will use later
+
+#------------------------------ Start of the Program ----------------------------------------------------
+GetX: #this is where we start with to get the base 
+li $v0 4
+la $a0, enterBase #Enter a base number
+syscall
+
+li $v0, 4
+la $a0, str0
+syscall
+
+li $v0, 5 #this is wherer the user will enter the number for their base number to use for
+syscall
+
+add $s0, $v0, $0 # this is going to store the number we just put for base into $s0
+
+#now we are going to set it as a $t1 so pretty much transfer $s0 = $t1
+add $t1, $s0, $0 #pretty much now X = $t1
+
+#----------------------------------- Getting the Power for the base -----------------------------------------------------------------------------------
+
+GetY: #Now we then go to get our exponent
+li $v0, 4
+la $a0, enterPower # Enter the exponent you would like to usr: 
+syscall
+
+li $v0, 5 #this is where user enteres the power for their base
+syscall
+
+add $s1, $v0, $0 # The number we now input is going to be stored into $s1
+
+#now we are going to $s1 into something else
+add $t2, $s1, $0 # pretty much moving $s1 into $t2 
+
+li $t0, 1  #this is to set up that 1 is going to be $t0 and we will use later
+blt $s1, $0, errorLessThanZero #This is if the number that is inputted is less than 0
+beq $s1, $0, outputIsOne #this is pretty much when the the input is 0 then the answer should automatically be 1
+
+
+#---------------------------------- Now we make the loop that is going to do and times it multple times by the power ----------------------------------
+loop:
+beq $t2, $0, endProgram #this is going to the end after it is all done
+addi $t2, $t2, -1 #this is for reducing everytime
+
+mult $t0, $s0 #this is for mult
+mflo $t0
+
+j loop #jump back to the loop
+
+#----------------------------------- The error part of entering a number less than zero ---------------------------------------------------------------
+
+errorLessThanZero:
+li $v0, 4
+la $a0, errorMsg #***ERROR: 
+syscall
+
+li $v0, 1
+add $a0, $s1, $0 #this is outputting the number that is shown that was wrong
+syscall
+
+li $v0, 4
+la $a0, errorMsg2 #is not a valid exponent number. Enter another power number
+syscall
+
+j GetY
+
+#----------------------------------- If they enter 0 then the output should automatically be 1 ---------------------------------------------------------
+
+outputIsOne:
+
+li $v0, 4
+la $a0, case0 #Any integer that's power is equal to zero will have a result of 1.
+syscall
+
+j endProgram #this is going to go straight to the end of the program because we got the answer already
+
+
+
+#------------------------------ The end of the Program ---------------------------------------------------------------------------------
+endProgram: #this is where then the program ends
+li $v0, 4
+la $a0, answer #this is going to 
+syscall
+
+li $v0, 1
+add $a0, $t0, $0
+syscall
+
+
+
+li $v0, 10
+syscall
