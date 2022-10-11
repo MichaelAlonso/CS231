@@ -1,0 +1,93 @@
+.data
+str0: .asciiz "\n"
+str1: .asciiz "Program Description: \t\t This program program written to mimic a very basic calculator\n"
+str2: .asciiz "Author: \t\t\t\t Michael Alonso Ambrocio\n"
+str3: .asciiz "Creation Date: \t\t\t 9/9/22\n"
+str4: .asciiz "=======================================================================\n"
+str5: .asciiz "How many numbers would you like to add? " 
+str6: .asciiz "The sum of the even numbers is "
+.text
+
+main:
+
+li $v0, 4
+la $a0, str4  #=====================================================
+syscall
+
+li $v0, 4
+la $a0, str0 #\n
+syscall
+
+li $v0, 4
+la $a0, str1 #Program Description \t\t This program program written to mimic a very basic calculator
+syscall
+
+li $v0, 4
+la $a0, str0 #\n
+syscall
+
+li $v0, 4
+la $a0, str2 #Author \t\t\t\t Michael Alonso Ambrocio
+syscall
+
+li $v0, 4
+la $a0, str0 #\n
+syscall
+
+li $v0, 4
+la $a0, str3 #Creation Date: \t\t\t 9/9/22
+syscall
+
+li $v0, 4
+la $a0, str0 #\n
+syscall
+
+li $v0, 4
+la $a0, str4 #=========================================================
+syscall
+
+li $v0, 4
+la $a0, str0 #\n
+syscall
+
+li $v0, 4
+la $a0, str5 #How many numbers would you like to add?
+syscall
+
+li $v0, 5 #user input for the amount they would like to add
+syscall
+
+add $s0, $v0, $0 #moving the user input into $s0
+
+li $t0, 6 #hardcoding 6 since this is the number we are going to use to divide with
+
+Loop:
+	beq $s0, $0, next #this is our start of the loop 
+	#addi $s0, $s0, -1 #this is going to update the counter
+	
+	li $v0, 5 #from line 67 to 69 this is when the user inputs the number of times they put of the numbers they would like to add
+	syscall
+	add $s1, $v0, $0
+
+	div $s1, $t0 #this is now going to divide Number/6
+	
+	mfhi $t2 #this is going to store the mfhi which is the remainder into $t2
+	
+	addi $s0, $s0, -1 #this is going to update the counter
+	
+	bne $t2, $0, Loop #this will now show that if mfhi is zero 
+	add $s3, $s3, $s1 #sum = sum + numbers
+	j Loop #going back to loop
+
+next:
+	li $v0, 4
+	la $a0, str6 #The sum of the even numbers is
+	syscall
+	
+	li $v0, 1
+	add $a0, $s3, $0, #this is going to display $s3 which is our total number
+	syscall
+
+	#this is the end of the program
+	li $v0, 10
+	syscall
