@@ -1,0 +1,78 @@
+.data
+str1: .asciiz "Program Description \t\t\t This program program written to mimic a very basic calculator"
+str2: .asciiz "Author \t\t\t Michael Alonso Ambrocio\n"
+str3: .asciiz "Creation Date: \t\t\t 2/9/22\n"
+str4: .asciiz "=========================================\n"
+str5: .asciiz "Please input the two numbers?\n"
+str6: .asciiz "\nProduct is: "
+str7: .asciiz "\nQuotient is: "
+str8: .asciiz "\nRemainder is: "
+.text
+main:
+li $v0, 4
+la $a0, str1
+syscall
+
+li $v0, 4
+la $a0, str2
+syscall
+
+li $v0, 4
+la $a0, str3
+syscall
+
+li $v0, 4
+la $a0, str4
+syscall
+
+li $v0, 4
+la $a0, str5
+syscall
+
+li $v0, 5
+syscall
+add $s0, $0, $v0
+
+li $v0, 5
+syscall
+add $s1, $0, $v0
+
+
+#to be able to multiple
+mult $s0, $s1
+mfhi $t2
+mflo $t3
+
+li $v0, 4
+la $a0, str6
+syscall
+
+add $a0, $t3, $0
+li $v0, 1
+syscall
+
+#to be able to divide
+div $s0, $s1
+
+mfhi $t4
+mflo $t5
+
+li $v0, 4
+la $a0, str7
+syscall
+
+add $a0, $t5, $0
+li $v0, 1
+syscall
+
+#To do the remainder
+li $v0, 4
+la $a0, str8
+syscall
+
+add $a0, $t4, $0
+li $v0, 1
+syscall
+
+li $v0, 10
+syscall
