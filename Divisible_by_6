@@ -1,0 +1,162 @@
+.data
+str0: .asciiz "\n"
+programDescription: .asciiz "Program Description: \t\t This program sums up positive numbers of 6 entered by a user\n"
+author: .asciiz "Author: \t\t\t\t Michael Alonso Ambrocio\n"
+creationDate: .asciiz "Creation Date: \t\t\t 9/19/22\n"
+lines: .asciiz "=======================================================================\n"
+Quest: .asciiz "How many positive numbers that are devisable by 6 do you want to add?"
+enterNum: .asciiz "Enter a number: "
+arrow: .asciiz "==>"
+divisible: .asciiz "is divisble by 6\n"
+notDivisible: .asciiz " is not divisble by 6. Enter another number.\n"
+error: .asciiz "**** ERROR: "
+rangeError: .asciiz " is not in the range of 1 to 100. Enter another number.\n"
+sumEven: .asciiz "The sum of the even number is: "
+.text
+
+main:
+li $v0, 4
+la $a0, lines  #=====================================================
+syscall
+
+li $v0, 4
+la $a0, str0 #\n
+syscall
+
+li $v0, 4
+la $a0, programDescription #Program Description \t\t This program program written to mimic a very basic calculator
+syscall
+
+li $v0, 4
+la $a0, str0 #\n
+syscall
+
+li $v0, 4
+la $a0, author #Author \t\t\t\t Michael Alonso Ambrocio
+syscall
+
+li $v0, 4
+la $a0, str0 #\n
+syscall
+
+li $v0, 4
+la $a0, creationDate #Creation Date: \t\t\t 9/9/22
+syscall
+
+li $v0, 4
+la $a0, str0 #\n
+syscall
+
+li $v0, 4
+la $a0, lines #=========================================================
+syscall
+
+li $v0, 4
+la $a0, str0 #\n
+syscall
+
+li $v0, 4
+la $a0, Quest #"How many positive numbers that are devisable by 6 do you want to add?"
+syscall
+
+li $v0, 4
+la $a0, str0 #\n
+syscall
+
+#-----------------------------------------------------------------------------------------------------------------------------------
+
+li $v0, 5 #this is going to get the number that we put for amount of positive numbers and divisible by 6
+syscall
+
+add $s0, $v0, $0 #this is going to put the number we input into $t0
+
+addi $t1 $0, 1 #this is going to register as 1
+addi $t2, $0, 100 #this is going to register as 100
+addi $t3, $0, 6 #this is now going to be 6 and is what we will use to divide and make sure it is divisble by 6
+
+#-------------------------------------------------------------------------------------------------------------------------------------------
+#this is where the program starts after inputting the amount of nunbers we want to use
+
+start: beq $s0, $0, done #dragged the input from the user into here to put the amount of times they wanted to
+
+li $v0, 4
+la $a0, enterNum #"Enter a number: "
+syscall
+
+#now we are going to enter the numbers
+li $v0, 5
+syscall
+
+add $s1, $v0, $0 #this is going to move the the numbers we put into $s1
+
+li $v0,4
+la $a0, str0 #\n
+syscall
+
+#this part is going to check if it is a number between 1 and 100 and if not then it will go directly to error1
+blt $s1, $t1, error1 #this is going to be when it is not in the range and is under 1
+bgt $s1, $t2, error1 #this is going to be when it is also not in the range and goes over 100
+
+div $s1, $t3 #this is then going to divide by the number that we put $s1 and divide it by what we made 6 which is $t3
+
+mfhi $t5 #this is the remainder
+
+bne $t5, $0, error2 #this is then going to check if the remainder is 0 and if not then we go directly to error2
+
+addi $s0, $s0, -1 #if it passes everything else then the number will reduce and keep going till we reach the amount of times we inputted the number ex 5 = 5 -1 = 4 4-1 = 3 etc
+
+add $s2, $s2, $s1 #this is now going to add up everything and $s2 is our final answer
+
+j start #going to go to start
+
+error1: #since we got an error for error1 which means that it wasnt in range of 1 - 100
+
+li $v0, 4
+la $a0, arrow #"==>"
+syscall
+
+
+li $v0, 4
+la $a0, error
+syscall
+
+li $v0, 1
+add $a0, $s1, $0 #this is going to show the number that we inputted that was wrong
+syscall
+
+li $v0, 4
+la $a0, rangeError #is not in the range of 1 to 100. Enter another number.
+syscall
+
+j start #is now going to jump back to the start
+
+error2: #this error going to 
+li $v0, 4
+la $a0, arrow #"==>"
+syscall
+
+li $v0, 4
+la $a0, error
+syscall
+
+li $v0, 1
+add $a0, $s1, $0 #this is going to show the number that we inputted that was wrong
+syscall
+
+li $v0, 4
+la $a0, notDivisible #is not divisble by 6. Enter another number.
+syscall
+
+j start #goes back to start and enter a number that is divisble by 6
+
+done: #this is where we go once we finish everything
+li $v0, 4
+la $a0, sumEven #The sum of the even number is: 
+syscall
+
+li $v0, 1
+add $a0, $s2, $0 #this is going to print our final answer as a number
+syscall
+
+li $v0 10 #this is the end of the program
+syscall
