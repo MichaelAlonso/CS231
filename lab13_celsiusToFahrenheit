@@ -1,0 +1,96 @@
+.data
+number1: .float 9.0
+number2: .float 5.0
+number3: .float 32.0
+str0: .asciiz "\n"
+programDescription: .asciiz "Program Description: \t\t  Write a program that prompt the user for a temperature in Celsius and then display the result in Fahrenheit.\n"
+author: .asciiz "Author: \t\t\t Michael Alonso Ambrocio\n"
+creationDate: .asciiz "Creation Date: \t\t\t 10/5/22\n"
+lines: .asciiz "=======================================================================\n"
+celsius: .asciiz "Please input a temperature in Celsius: => "
+fahrenheit: .asciiz "The temperature in Fahrenheit is: => " 
+.text
+
+	li $v0, 4
+	la $a0, lines  #=====================================================
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, programDescription #Program Description \t\t This program program written to mimic a very basic calculator
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, author #Author \t\t\t\t Michael Alonso Ambrocio
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, creationDate #Creation Date: \t\t\t 9/9/22
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, lines #=========================================================
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+	
+#======================================== The start of the program ====================================================================
+
+	li $v0, 4
+	la $a0, celsius # Please input a temperature in Celsius: =>
+	syscall
+	
+	li $v0, 5 #this is for the user to input the celsius
+	syscall
+	
+	addi $t0, $v0, 0 #this is going to store the user input of $v0 to $t0
+	
+	mtc1 $t0, $f0 #this is going to move the user input to the co-processor
+	
+	cvt.s.w $f0, $f0 #this will convert the user input into float and then being stored into $f0
+	
+#====================================== $f1 is set to 9.0 ==========================================================================	
+	
+	l.s $f1, number1 #this is going to make 9.0 and be registered as $f1
+	
+	mul.s $f0, $f0, $f1 #this is going to multiply 
+	
+#====================================== $f1 is set to 5.0 ==========================================================================
+	l.s $f1, number2 #this is now going to make $f1 into 5.0
+	
+	div.s $f0, $f0, $f1 #this is then going to $f0 by $f1 which is now 5.0
+	
+#====================================== $f1 is set to 32.0 =========================================================================
+	l.s $f1, number3 #thi is then going to make $f1 into 32.0
+	
+	add.s $f0, $f0, $f1 #this is going to now add 32.0
+	
+	li $v0, 4
+	la $a0, fahrenheit #The temperature in Fahrenheit is: =>
+	syscall
+	
+	li $v0, 2 #this is going to be able to display the float 
+	mov.s $f12, $f0
+	syscall
+	
+	li $v0, 10 #this is the end of the program
+	syscall
+	
+	
