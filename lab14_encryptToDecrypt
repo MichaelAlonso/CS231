@@ -1,0 +1,149 @@
+.data
+str0: .asciiz "\n"
+programDescription: .asciiz "Program Description: \t\t  Write a program that prompts the user for a 9 character line of text. Then you need to encrypt the text using Number 10. Then you are requiring decrypting the massage and outputting it.\n"
+author: .asciiz "Author: \t\t\t Michael Alonso Ambrocio\n"
+creationDate: .asciiz "Creation Date: \t\t\t 10/5/22\n"
+lines: .asciiz "=======================================================================\n"
+enterString: .asciiz "Please enter the message to be sent: "
+encrypted: .asciiz "Your encrypted message is: "
+decrypted: .asciiz "Your decrypted message is: "
+str1: .byte ' ',' ',' ',' ',' ',' ',' ',' ',' ',' '
+str2: .byte ' ',' ',' ',' ',' ',' ',' ',' ',' ',' '
+str3: .byte ' ',' ',' ',' ',' ',' ',' ',' ',' ',' '
+.text
+
+	li $v0, 4
+	la $a0, lines  #=====================================================
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, programDescription #Program Description \t\t This program program written to mimic a very basic calculator
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, author #Author \t\t\t\t Michael Alonso Ambrocio
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, creationDate #Creation Date: \t\t\t 9/9/22
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, lines #=========================================================
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+	
+#======================================== The start of the program ====================================================================
+
+	li $v0, 4
+	la $a0, enterString #Please enter the message to be sent: 
+	syscall
+	
+	la $a0, str1 #this is going to take user input up to 9 in length
+	
+	li $v0, 8
+	li $a1, 10
+	syscall
+	
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+	
+	li $v0, 4
+	la $a0, str1 #this is going to print out the user input
+	syscall
+	
+	li $t0, 10 #this is going to set the key to 10 and with $s0 to the number of indexes of the input string
+	add $s0, $0, $a1
+	
+	la $s1, str1 #this is going to load s1 and s2 to the memory addresses of input and copy strings
+	
+	la $s2, str2
+	
+#======================================== This is the loop of the program ===============================================================
+loop: 
+	beq $s0, $0, out #this is going to go to out when it reaches to 0
+	li $t1, 0 #this is going to clear $t1
+	lb $t1, 0($s1) #this is going to load the index of input string into $t1
+	
+	xor $t2, $t1, $t0 #this is going to encrypt $t2 with the values of $t1 and the key of $t0
+	sb $t2, 0($s2) #this is going to store the encrypte value in the index of the copy string
+	
+	addi $s1, $s1, 1 #this changing the counter and string indexes by -1 and 1
+	addi $s2, $s2, 1
+	addi $s0, $s0, -1
+	
+	j loop #this is going to jump back to the loop till we are done
+	
+#====================================== This is now going to go to the out loop =========================================================
+out: 
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+	
+	li $v0, 4
+	la $a0, encrypted #Your encrypted message is: 
+	syscall
+	
+	li $v0, 4
+	la $a0, str2 #this is going to output the encrypted message
+	syscall
+	
+	la $s1, str3  #this is now going to reset $s1 and $s2 to the first indexes of decrypt and copy strings
+	la $s2, str2
+	
+	add $s0, $0, $a1 #this is going to reset the counter to number of indexes in the input string
+	
+#======================================= Now this is the second loop that we are going to ================================================
+secondLoop:
+	beq $s0, $0, programDone #this is once it reaches to 0 we then go to programDone
+	
+	li $t1, 0 #this is going to clear $t1 and $t2
+	li $t2, 0
+	
+	lb $t1, 0($s2) #this is now going to load and encrypt index of $s2 to $t1
+	
+	xor $t2, $t1, $t0 #this is going to decrypt the index by XOR the index with the key and storing into $t2
+	
+	sb $t2, 0($s1) #this is now going to store the decrypted value into the index of $s1
+	
+	addi $s1, $s1, 1 #all of these are going to change the counters and indexes
+	addi $s2, $s2, 1
+	addi $s0, $s0, -1
+	
+	j secondLoop #this is going to go back to the secondLoop till we are done
+#======================================== Now the end of the program we just display ======================================================
+programDone:
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, decrypted #Your decrypted message is: 
+	syscall
+	
+	li $v0, 4
+	la $a0, str3 #this is now going to output the message
+	syscall
+	
+	li $v0, 10 #this is going to be the end of the program
+	syscall
