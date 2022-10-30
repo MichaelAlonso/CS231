@@ -1,0 +1,80 @@
+.data
+myarray : .word 0,0,0,0,0,0,0,0,0,0
+size_prompt: .asciiz "Enter array size : "
+large: .asciiz "The largest element is : "
+array_prompt: .asciiz "enter array element: "
+.text
+
+main:
+
+
+li $v0, 4 # system call (4) to print string
+la $a0, size_prompt # put string memory address in register $a0
+syscall # print string
+
+li $v0,5 # system call (5) to get integer from user and store in register $v0
+syscall # get user input for variable "size"
+addi $s1,$v0,0 #user input size in $s1
+
+ble $s1,0,main #if user input size less than or equal to 0 go to main label
+bgt $s1,10,main #if user input greater than 10 go to main label
+
+
+li $t0,0 #loop count 0
+la $s0,myarray #load addresss of my array in $s0
+
+
+
+
+Inputloop:
+beq $t0, $s1, endInputLoop #if $t0(loop index i)==$s1(size of array )
+mul $t2, $t0, 4 #t2=$t0*4 index*4
+
+li $v0, 4 #print array_prompt string
+la $a0, array_prompt
+syscall
+
+
+
+li $v0,5 # get input from user and store in $v0
+syscall
+
+add $t3, $s0, $t2 #$t3= $s0(base address of array) + $t2(index+word offset(4))
+sw $v0, 0($t3) #myArray[$t0]=$v0
+addi $t0, $t0, 1 # i = i + 1
+
+j Inputloop # jump InputLoop
+
+endInputLoop:
+
+li $t0,0
+
+loop: #loop label
+beq $t1,10,printLargest #t1==10 go to printLargest label
+mul $t3,$t1,4 #$t3=loop index*4
+add $t3,$t3,$s0 #t3= address of first element($s0)+ $t3
+lw $t2,0($t3) #$t2=myarray[$t1]
+
+ble $t2,$t0,skip #if current element <= $t0(largest element) go to skip
+
+addi $t0,$t2,0 #else $t0=$t2 make $t2 largest element
+
+
+skip:#skip label
+addi $t1,$t1,1 #increment loop count
+j loop #jump to loop
+
+
+printLargest:#print Largest label
+la $a0,large #print large string using syscall 4
+li $v0,4
+syscall
+
+#addi $a0,$t0,0 #$a0=$t0
+li $v0,1 #syscall 1
+addi $a0,$t0,0 #$a0=$t0
+syscall
+
+#terminate program
+li $v0,10 #syscall 10 to terminate program
+syscall
