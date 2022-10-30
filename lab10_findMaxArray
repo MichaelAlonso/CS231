@@ -1,0 +1,154 @@
+.data
+str0: .asciiz "\n"
+programDescription: .asciiz "Program Description: \t\t This program You read the number of elements or array size If the array size is within the range, pass the array size to the FindMax function. In FindMax function, find the maximum of the array and return it to main.In main print the maximum\n"
+author: .asciiz "Author: \t\t\t Michael Alonso Ambrocio\n"
+creationDate: .asciiz "Creation Date: \t\t\t 10/5/22\n"
+lines: .asciiz "=======================================================================\n"
+element: .asciiz "How many Elements Would you Like to addd: "
+error: .asciiz "=======> Too many Elements Or Less than 1 Element Try AGAINNNN!!!!\n"
+largest: .asciiz "The largest element is: "
+myArray: .word 0,0,0,0,0,0,0,0,0,0
+.text
+li $v0, 4
+	la $a0, lines  #=====================================================
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, programDescription #Program Description \t\t This program program written to mimic a very basic calculator
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, author #Author \t\t\t\t Michael Alonso Ambrocio
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, creationDate #Creation Date: \t\t\t 9/9/22
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, lines #=========================================================
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $s2, 10 #cant go over 10 elements
+	la $s1, myArray
+	
+#============================================================================================================== This is going to be the main function of our program ============================================================================================================================================================	
+	
+main:
+
+#========================================== We have our enter element function so we can use to enter the elements we want no more than 10 tho =======================================================================================================================
+enterElement:
+
+	li $v0, 4
+	la $a0, element #How many Elements: 
+	syscall
+	
+	li $v0, 5 #this is then letting the user enter the number of elements they want to use
+	syscall
+	
+	add $t0, $v0, $0 #rhis is going to store the number we put
+	add $s0, $t0, $0 #this is then going to store $t0 to $s0
+	
+	blt $s0, 1, notInRangeOfElement #if user puts anything less than 1 then they will go to this function 
+	bgt $s0, 10, notInRangeOfElement #if user puts anything greater than 10 then they will go to this function
+	
+	add $a1, $t0, $0 #this is pretty much in c++ fillArray(user input)
+	jal fillArray
+	
+	add $a1, $t0, $0 #this is pretty much in c++ findMax(user input)
+	jal max
+	
+	add $s4, $v1, $0 #this is getting the result back and putting it into the register $s4
+	
+	li $v0, 4
+	la $a0, largest #The largest element is: 
+	syscall
+
+	li $v0, 1
+	add $a0, $s4, $0 #this part is showing our largest number which is assign at $s4
+	syscall
+	
+	li $v0, 10 #emd of the program
+	syscall
+	
+#=================================================== This is going to add the elements to the array ========================================================================================
+fillArray: 
+	la $s1, myArray
+	add $s0, $a1, $0
+	
+#==================================================== This is our loop that we are going to be using and going to go through each time when we add a element =============================
+loop:
+	beq $s0, $0, out #this is with the amount of the element that we put in and then at the end of it we go to out 
+	
+	li $v0, 5 #this is going to let us put the numbers we want inside the element
+	syscall
+	
+	add $t0, $v0, $0 #this is going to put our input numbers into register $t0
+	
+	sw $t0, 0($s1) #this is going to store the data 
+	
+	addi $s0, $s0, -1 #this is going to decrease everytime
+	addi $s1, $s1, 4 #this is going to go to the next array to fill in
+	
+	j loop #this is going to go back to the loop and keep going till it finishes all the elements
+	
+#=================================================== This is going to display the error when we either have less than 1 or more than 10 =====================================================
+notInRangeOfElement:
+	li $v0, 4
+	la $a0, error #=======> Too many Elements Or Less than 1 Element!!!
+	syscall
+	
+	j enterElement #this is going to go back to enterElement to enter an element between 1 to 10
+	
+#=================================================== this is my out function ===============================================================================================================
+out:
+	jr $ra #this is just going to be specifically to return back pretty much return(x)
+	
+#================================================== This is going to find the max in the array of elements =================================================================================
+max:
+	la $s1, myArray
+	add $s0, $a1, $0
+	
+	lw $s6, 0($s1) #this is going to load word element into $s6
+	
+#=================================================== This is going to be finding the greatest in the array =================================================================================
+outLoop:
+	bgt $s3, $s0, done #this will then go to done when done 
+	addi $s1, $s1, 4 #this is going to be going through the elements
+	
+	lw $s4, 0($s1) #this will then load word element into and store into $s4
+	
+	addi $s0, $s0, -1 #this is going to decrease everytime till we have nothing
+	
+	bgt $s4, $s6, change #then wwe will go to change
+	
+	 j outLoop #this is going to jump back to the outLoop
+	 
+#================================================== This is the change function ============================================================================================================
+change:
+	add $s6, $s4, $0 #we are now putting $s4 into $s6
+	j outLoop #this is then going to jump back to the outloop
+# ==================================================== This is the done function ===========================================================================================================
+done:
+	add $v1, $s6, $0 #we have to set it back to a $v1 when putting it back
+	jr $ra #this is pretty much to get back now
