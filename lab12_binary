@@ -1,0 +1,145 @@
+.data
+str0: .asciiz "\n"
+programDescription: .asciiz "Program Description: \t\t  Input a integer from the user and pass the number to be in binary\n"
+author: .asciiz "Author: \t\t\t Michael Alonso Ambrocio\n"
+creationDate: .asciiz "Creation Date: \t\t\t 10/5/22\n"
+lines: .asciiz "=======================================================================\n"
+decimal: .asciiz "Input a number in decimal form: "
+answerPart1: .asciiz "The number "
+answerPart2: .asciiz " in binary is: "
+negative: .asciiz "Can't be negative Try Again!!"
+.text
+
+	li $v0, 4
+	la $a0, lines  #=====================================================
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, programDescription #Program Description \t\t This program program written to mimic a very basic calculator
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, author #Author \t\t\t\t Michael Alonso Ambrocio
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, creationDate #Creation Date: \t\t\t 9/9/22
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, lines #=========================================================
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+	
+	
+	li $s7, -1
+#============================================ The Start of the Program ==================================================================
+
+main:
+	li $v0, 4
+	la $a0, lines  #=====================================================
+	syscall
+	
+	li $v0, 4
+	la $a0, decimal #Input a number in decimal form: 
+	syscall
+	
+	
+	li $v0, 5 #this is going to get the user input
+	syscall
+	addi $a1, $v0, 0 #this is going to make $v0 of the user input into $a1 and use it to go to convert function
+	
+	blt $a1, $0, error #this is going to be our error if they put an input from $s0 that is less than 1
+	
+	jal convert
+	
+	li $v0, 10 #this is going to be the end of the program
+	syscall
+	
+#============================================= This is for our error function ==========================================================
+error:
+	li $v0, 4
+	la $a0, negative 
+	syscall
+	
+	j main	
+
+#=========================================== This is for our convert function ==========================================================
+	
+convert:
+	addi $t0, $a1, 0 #this is now going to make $a1 into $t0
+	addi $t2, $0, 2 #this is gonna make $t2 into 2
+	addi $t3, $0, 0 #this is to make $t3 to a counter
+	
+#========================================== This is for our loop that it is going to divide =============================================
+	
+loop:
+	beq $t0, $0, secondLoop #This is going to be once the loop is done then we jump to the second loop
+	
+	div $t0, $t2 #this is going to divide the number that we entered $t0 / and $t2 which we made to 2
+	
+	mflo $t0 #this is the quotient
+	mfhi $t1 #this is the remainder
+	
+	addi $sp, $sp, -4 #this is then going to create space in the stack
+	sw $t1, 0($sp) #this is going to push the remainder into the stack
+	
+	addi $t3, $t3, 1 #this is going to increase the counter 1 till we fill up the 32 bits
+	
+	j loop #this is going to jump back to the loop till we are done
+	
+#========================================== This is for our second loop ===============================================================
+
+secondLoop:
+	li $t4, 32
+	
+	sub $t4, $t4, $t3 #this is now the new counter
+	
+#========================================== This is our zero function which will display the zeros =====================================
+zero:
+	beq $t4, $0, binary #This is when we are going to go to binary once this part is over
+	
+	li $v0, 1
+	Li $a0, 0 #this part is to be able to display the 0's
+	syscall
+	
+	addi $t4, $t4, -1 #this is goiong to subtract everytime till we reach the amount of zeros
+	
+	j zero #this is going to jump back to zero
+	
+#========================================= This is then going to fill in the binary number ==============================================
+binary:
+	beq $t3, $0, done #this is when this part is done then we go to done
+	
+	lw $a0, 0($sp)
+	addi $sp, $sp, 4
+	
+	li $v0, 1 #this is then going to print out the stack top to bottom how it is in binary
+	syscall
+	
+	addi $t3, $t3, -1 #this is our counter to be able to do this loop until it is done
+	
+	j binary #this is then going to jump back to binary
+	
+#============================================= This is pretty simple this will just go back to the main function =======================
+done:
+	jr $ra #go back to main
