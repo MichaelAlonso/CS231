@@ -1,0 +1,163 @@
+ .data
+str0: .asciiz "\n"
+programDescription: .asciiz "Program Description: \t\t This program is to be able to find the median in the array\n"
+author: .asciiz "Author: \t\t\t\t Michael Alonso Ambrocio\n"
+creationDate: .asciiz "Creation Date: \t\t\t 9/19/22\n"
+lines: .asciiz "=======================================================================\n"
+Enter: .asciiz "How many numbers would you like to add: "
+Error: .asciiz "Error array can’t have more than 10 elements, try again!! \n"
+median: .asciiz "The median is: "
+myArray: .word 0,0,0,0,0,0,0,0,0,0
+
+.text
+	li $v0, 4
+	la $a0, lines  #=====================================================
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, programDescription #Program Description \t\t This program program written to mimic a very basic calculator
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, author #Author \t\t\t\t Michael Alonso Ambrocio
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, creationDate #Creation Date: \t\t\t 9/9/22
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, lines #=========================================================
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $s2, 10 #this is setting up so that we cant go over the element of 10
+	la $s1, myArray
+	
+#============================================================ This function is going to keep repeating till we get a number that is not above 10 ==============================================	
+putMoreThanTen:
+	li $v0, 4
+	la $a0, Enter #How many numbers would you like to add:
+	syscall	
+	
+	li $v0, 5 #this is going to get the user input of the number for the amount of elements they are going to use
+	syscall
+	
+	add $t0, $v0, $0 #this is going to move $v0 to $t0 for the user input
+	add $s0, $t0, $0 #This is now going to move $t0 to $s0
+	add $t1, $t0, $0, #stores the number of elements in t0 to s1
+	
+	blt $s0, 1, notValid #This is going to go to notValid because it is not the number we want 
+	bgt $s0, 10, notValid #this is so if it goes over 10 then we go to NotValid
+	
+#============================================================ This is when we add Elements to the array =====================================================================================
+addElement:
+	beq $s0, $0, next
+	
+	li $v0, 5 #this is our user input when they are adding the numbers from the elements they put in.
+	syscall 
+	
+	add $t0, $v0, $0 #this now moving $v0 to $t0
+	
+	sw $v0, 0($s1) #going to store data 
+	
+	addi $s0, $s0, -1 #this is going to subtract the number that we entered in the beginnning of our program
+	addi $s1, $s1, 4 #this goes up by 4 because of the array
+	
+	j addElement
+
+#=========================================================== This is where if they put a different number at the beginning gives us an error ================================================ 
+notValid:
+	li $v0, 4
+	la $a0, Error #Error array can’t have more than 10 elements, try again!!
+	syscall
+	
+	j putMoreThanTen #this is going to jump back to this loop
+
+#=============================================================================================================================================================================================
+next:
+	add $s0, $t0, $0 #this is going to restart the limit back
+	
+	#li $s1, myArray
+	li $s3, 1
+	lw $t0, 0($s1)
+	
+	add $s4, $t0, $0 #this is now going to initially the first value of the array
+	
+#============================================================= This is going to check if the element number we put is odd or even ============================================================
+oddOrEven:
+	addi $t2, $0, 2 #this is going to store 2 to $t2 
+	
+	div $t1, $t2 #this is going to divide the number of elements by 2 
+	mfhi $t3 #if there is a remainder then it is odd and we go to the other function
+	
+	beq $t3, 1, odd #this is going to go to the odd function
+	
+	beq $t3, 0, even #this is going to go to the even function
+
+#============================================================ This is for our odd function and be able to add two middle numbers and dividing by 2 =====================
+odd:
+	div $t1, $t2 #this is going to divide the elements by 2 and find the middle number
+	mflo $t4 #this is going to be registered $t4 and our answer for div
+	
+	mul $t4, $t4, 4 #this is going to multiply
+	
+	la $s1, myArray #this is going to reinitializes array
+	add $s1, $s1, $t4 #this is going store $t4 into $s1
+	
+	lw $s6, 0($s1) #this is going to load word element into $s6
+	j finish #after this its going to jump to Finish function which gets our answer and end program
+	
+#============================================================ This is for our even function =================================================================
+even:
+	div $t1, $t2 #this is going to do the same thing as the one in the odd function
+	mflo $t4 #our answer 
+	
+	mul $t4, $t4, 4 
+	
+	la $s1, myArray #resets the array
+	add $s1, $s1, $t4 #store $t4 to $s1
+	
+	lw $s5, 0($s1)#this will loads words element into $s5
+	
+	addi $s1, $s1, -4 
+	lw $s6, 0($s1) #this will get the element from $s5 and then stores it to $s6
+	
+	add $s6, $s6, $s5 #this is going to add $s6 and $s5
+	div $s6, $t2 #this is going to div the $s6 and 2
+	
+	mflo $s6 #this is the answer
+	
+	j finish #after we are done with all of this we go to the end
+
+#======================================================== This is the end of our program and show result ==============================================
+finish:
+	li $v0, 4
+	la $a0, median #The median is: 
+	syscall
+	
+	li $v0, 1
+	add $a0, $s6, $0 #this is going to show our number answer
+	syscall
+	
+	li $v0, 10 #this is the end of the program
+	syscall
