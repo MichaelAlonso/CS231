@@ -1,0 +1,141 @@
+.data
+str0: .asciiz "\n"
+programDescription: .asciiz "Program Description: \t\t This program You read the number of elements or array size If the array size is within the range, pass the array size to the FindMax function. In FindMax function, find the maximum of the array and return it to main.In main print the maximum\n"
+author: .asciiz "Author: \t\t\t Michael Alonso Ambrocio\n"
+creationDate: .asciiz "Creation Date: \t\t\t 10/5/22\n"
+lines: .asciiz "=======================================================================\n"
+element: .asciiz "How many Elements Would you Like to addd: "
+error: .asciiz "=======> Too many Elements Or Less than 2 Element Try AGAINNNN!!!!\n"
+answer: .asciiz "The sum of the elements is ====> "
+myArray: .word 0,0,0,0,0,0,0,0,0,0
+.text
+	li $v0, 4
+	la $a0, lines  #=====================================================
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, programDescription #Program Description \t\t This program program written to mimic a very basic calculator
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, author #Author \t\t\t\t Michael Alonso Ambrocio
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, creationDate #Creation Date: \t\t\t 9/9/22
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, lines #=========================================================
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+	
+#======================================================================================= This is the start of the program ====================================================================================================================
+
+	li $s2, 10 #this is going to set the limit to 10
+	la $s1, myArray #this is for myArray
+
+#======================================================================================= This is going to be our enter element and if it goes over 10 and less than 1 we also go back to it ===================================================	
+enterElement:
+	li $v0, 4
+	la $a0, element #How many Elements Would you Like to add:
+	syscall
+	
+	li $v0, 5 #this is going to get our user input for the element
+	syscall 
+	add $t0, $v0, $0 #this is going to move user input of $v0 to $t0
+	
+	add $s0, $t0, $0 #this is now going to move $t0 to $s0
+	add $t5, $t0, $0 #this is also going to move $t0 to $t5
+	
+	blt $s0, 2, notInRangeOfElement #this is going to be our error if they put an input from $s0 that is less than 1
+	bgt $s0, 10, notInRangeOfElement #this is going to also be our error if they put an input from $s0 that is more than 10
+
+	add $a1, $s0, $0 #this is to set the number of elements and move $s0 to $a1
+	
+	jal fillArray #this is going to call the fillArray function
+
+	add $a1, $t5, $0 #this is going to transfer $t5 to $a1
+	jal sum #this is going to call the sum function
+
+	add $s4, $v1, $0 #the $v1 we got from that function is going to be registered as $s4
+
+	li $v0, 4
+	la $a0, answer #The sum of the elements is ====> 
+	syscall
+
+	li $v0, 1
+	add $a0, $s4, $0 #this is going to display the actual number that we got
+	syscall
+	
+	li $v0, 10 #this is to end the program
+	syscall
+
+#================================================================================================================================================================================================================================================
+notInRangeOfElement:
+	li $v0, 4
+	la $a0, error #=======> Too many Elements Or Less than 2 Element Try AGAINNNN!!!!
+	syscall
+	
+	j enterElement #this is then going to jump back to the enterElement to try again
+
+#================================================================================================================================================================================================================================================
+fillArray:
+	add $s0, $a1, $0 #this is adding the $a1 that we assigned before to $s0
+	
+loop:
+	beq $s0, $0, done #this is gong to repeat the loop till it reaches zero from the input
+	
+	li $v0, 5 #this is going to get the inputs of the user
+	syscall
+
+	add $t0, $v0, $0 #this is going to move the $v0 to $t0
+	
+	sw $t0, 0($s1) #this is to store the data to $s1
+	
+	addi $s0, $s0, -1 #this is going to subtract the number of elements everytime until we cant subtract it no more and the loop is done
+	add $s1, $s1, 4 #this is for the array to go up everytime we enter a new number
+	
+	j loop #this is going to jump back to loop
+
+done: #since the loop is over we then now go to here
+	jr $ra #this is going to return back what we want
+	
+#=====================================================================================================================================================================================	
+sum:
+	la $s1, myArray
+	add $s0, $a1, $0 #this is then assigning the $a1 to a $s0
+
+secondLoop:
+	beq $s0, $0, secondDone #same thing as loop, once it reaches to 0 we go to secondDone
+	lw $t0, 0($s1) #this is going to load word element and then be stored into $s1
+	
+	add $t1, $t1, $t0
+	
+	addi $s0, $s0, -1 #this is going to subtract the counter everytime we go through it till we reach 0
+	addi $s1, $s1, 4 #this is then going to go up an array each time
+	
+	j secondLoop #this is going to jump back to secondLoop till we reach 0 
+	
+secondDone:
+	add $v1, $t1, $0 # this is then going to be registeres as $v1
+	jr $ra #this is going to go back 
