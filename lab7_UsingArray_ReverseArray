@@ -1,0 +1,126 @@
+.data
+str0: .asciiz "\n"
+programDescription: .asciiz "Program Description: \t\t This program is to use arrays and store them but also make it an reverse array\n"
+author: .asciiz "Author: \t\t\t\t Michael Alonso Ambrocio\n"
+creationDate: .asciiz "Creation Date: \t\t\t 9/19/22\n"
+lines: .asciiz "=======================================================================\n"
+numElem: .asciiz "Enter the number of elements: \n"
+error: .asciiz "Error array can’t have more than 10 elements, try again!! \n"
+reverseOrder: .asciiz "The content of array in reverse order is: \n"
+smallDash: .asciiz "================= \n"
+#this is our array that we have with 10 numbers that we are going to use
+myArray: .word 0,0,0,0,0,0,0,0,0,0
+.text
+main:
+	li $v0, 4
+	la $a0, lines  #=====================================================
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, programDescription #Program Description \t\t This program program written to mimic a very basic calculator
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, author #Author \t\t\t\t Michael Alonso Ambrocio
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, creationDate #Creation Date: \t\t\t 9/9/22
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	li $v0, 4
+	la $a0, lines #=========================================================
+	syscall
+
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+	
+	la $s1, myArray #this needs to be here we cannot put it into the loops or other functions it has to be outside
+
+inputs:	
+	li $v0, 4
+	la $a0, numElem #Enter the number of elements: \n
+	syscall
+	
+	li $v0, 5 #This is going to store the ten numbers that we are inputting into $v0
+	syscall
+	
+	addi $t0, $v0, 0 #the numbers that we inputted into $v0 are now going into $t0
+	addi $t1, $v0, 0
+	
+	li $v0, 4
+	la $a0, smallDash
+	syscall
+	
+	ble $t0, 0, inputs
+	ble $t0, 10, loop #this is going to loop if it is 
+	
+	li $v0, 4
+	la $a0, error #Error array can’t have more than 10 elements, try again!!
+	syscall
+	
+	add $s0, $t0, $0 #this is going to loop whatever $t0 times to get user inputs into array
+	j inputs
+	
+#========================================================== Now onto the loop ===============================================================================
+loop: 
+	beq $t0, $0, outLoop #if it is equal to zero then it will be going to out
+	li $v0, 5 #this will then let us enter the numbers that we are going to use
+	syscall
+
+	sw $v0, 0($s1)
+	
+	addi $t0, $t0, -1 #this is going to now reduce everytime we enter a number  
+	addi $s1, $s1, 4 #this is now that will go into the next slot of the array
+
+	j loop #jump back to the loop till its over
+
+#=========================================================== Now we are going to out =======================================================================
+
+out:
+	li $v0, 4
+	la $a0, reverseOrder #\n
+	syscall
+
+	addi $s1, $s1, -4
+		
+	j outLoop
+#========================================================== Now we are going to outLoop ====================================================================
+outLoop:
+	beq $t1, $0, end #this will then lead to the end which is the end of the program
+	lw $a0, 0($s1)
+	
+	li $v0, 1 #this is so we can display our numbers that we are inputting
+	syscall
+
+	addi $t1, $t1, -1 #this is going to now reduce everytime we enter a number
+	addi $s1, $s1, -4 #this is now going to make it go reverse instead of going forward
+	
+	li $v0, 4
+	la $a0, str0 #\n
+	syscall
+
+	j outLoop #this will then jump back to the outLoop
+#========================================================== Ending the program =============================================================================
+	
+
+end: 
+	li $v0, 10 #writing this is so we can end the program completely
+	syscall
